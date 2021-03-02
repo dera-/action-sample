@@ -1,0 +1,34 @@
+name: Choose npm token
+description: Choose npm token for the specified repository
+inputs:
+  target_dir:
+    description: Name of target directory
+    required: true
+  # 本来であればsecrets自体を直接参照もしくは入力値として受けるべきだが、action.yml内では両方不可なのでsecretsとして登録されているトークンをそれぞれ入力値として受け取る
+  npm_token_for_akashic:
+    description: akashic's npm token
+    required: true
+  npm_token_for_akashic_extension:
+    description: akashic-extension's npm token
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - id: package_json
+      run: echo "::set-output name=content::$(cat ./package.json | tr -d '\n')"
+      working-directory: ${{ inputs.target_dir }}
+      shell: bash
+    - id: npm_token
+      run: |
+        set +x
+        if [[ ${{ fromJson(steps.package_json.outputs.content).name }} =~ @akashic-extension/.+ ]]; then
+          echo "::set-output name=value::${{ inputs.npm_token_for_akashic_extension }}"
+        else
+          echo "::set-output name=value::${{ inputs.npm_token_for_akashic }}"
+        fi
+        set -x
+      shell: bash
+outputs:
+  token:
+    description: "Npm token for the specified repository"
+    value: ${{ steps.npm_token.outputs.value }}

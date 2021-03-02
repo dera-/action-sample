@@ -1,0 +1,14 @@
+name: Genearete release note
+description: Genearete release note from CHANGELOG.md
+inputs:
+  repository_path:
+    description: Path of published repository
+    required: true
+runs:
+  using: node12
+  main: index.js
+outputs:
+  version:
+    description: Target version
+  body:
+    description: Body for release note
