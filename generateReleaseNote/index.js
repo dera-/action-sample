@@ -6,6 +6,7 @@ const generateReleaseNote = require("./generateReleaseNote");
 try {
 	const repositoryPath = core.getInput("repository_path");
 	const packageJson = require(path.join(repositoryPath, "package.json"));
+	console.log(packageJson);
 	const version = packageJson["version"];
 	core.setOutput("version", "v" + version);
 	let body = "";
