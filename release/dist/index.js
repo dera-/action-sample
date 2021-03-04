@@ -5814,6 +5814,7 @@ const fs = __nccwpck_require__(747);
 const path = __nccwpck_require__(622);
 const core = __nccwpck_require__(505);
 const github = __nccwpck_require__(700);
+const npmPublish = __nccwpck_require__(52);
 
 try {
 	const targetDirPath = core.getInput("target_dir_path");
@@ -5844,6 +5845,14 @@ try {
 } catch (error) {
 	core.setFailed(error.message);
 }
+
+
+/***/ }),
+
+/***/ 52:
+/***/ ((module) => {
+
+module.exports = eval("require")("@jsdevtools/npm-publish");
 
 
 /***/ }),
