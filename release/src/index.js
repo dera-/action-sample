@@ -21,7 +21,7 @@ npmPublish({
 		body = generateReleaseNote(changelog, version);
 	}
 	const octokit = github.getOctokit(core.getInput("github_token"));
-	octokit.repos.createRelease({
+	return octokit.repos.createRelease({
 		owner: "dera-",
 		repo: core.getInput("git_repository"),
 		tag_name: "v" + version,
