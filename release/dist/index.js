@@ -11451,6 +11451,32 @@ try {
 
 /***/ }),
 
+/***/ 1245:
+/***/ ((module) => {
+
+module.exports = (changelog, version) => {
+	const changelogArray = changelog.split("\n");
+	const regex = /## (\d+\.\d+\..+)/;
+	let matchCount = 0;
+	let body = "";
+	for (let i = 0; i < changelogArray.length; i++) {
+		const match = changelogArray[i].match(regex);
+		if (match) {
+			if (matchCount > 0) {
+				break;
+			} else if (match[1] === version) {
+				matchCount++;
+			}
+		} else if (matchCount > 0) {
+			body += changelogArray[i] + "\n";
+		}
+	}
+	return body;
+};
+
+
+/***/ }),
+
 /***/ 1610:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -11459,36 +11485,35 @@ const path = __nccwpck_require__(5622);
 const core = __nccwpck_require__(8505);
 const github = __nccwpck_require__(5700);
 const npmPublish = __nccwpck_require__(4095);
+const generateReleaseNote = __nccwpck_require__(1245);
 
-try {
-	const targetDirPath = core.getInput("target_dir_path");
-	npmPublish({
-		package: path.join(targetDirPath, "package.json"),
-		token: core.getInput("npm_token"),
-		tag: core.getInput("target_npm_tag"),
-		access: "public"
-	}).then(() => {
-		const packageJson = require(path.join(targetDirPath, "package.json"));
-		const version = packageJson["version"];
-		let body = "";
-		const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
-		if (fs.existsSync(changelogPath)) {
-			const changelog = fs.readFileSync(changelogPath).toString();
-			body = generateReleaseNote(changelog, version);
-		}
-		const octokit = github.getOctokit(core.getInput("github_token"));
-		octokit.repos.createRelease({
-			owner: "dera-",
-			repo: core.getInput("git_repository"),
-			tag_name: "v" + version,
-			name: "Release " + version,
-			body: body,
-			target_commitish: core.getInput("target_branch")
-		});
+const targetDirPath = core.getInput("target_dir_path");
+npmPublish({
+	package: path.join(targetDirPath, "package.json"),
+	token: core.getInput("npm_token"),
+	tag: core.getInput("target_npm_tag"),
+	access: "public"
+}).then(() => {
+	const packageJson = require(path.join(targetDirPath, "package.json"));
+	const version = packageJson["version"];
+	let body = "";
+	const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
+	if (fs.existsSync(changelogPath)) {
+		const changelog = fs.readFileSync(changelogPath).toString();
+		body = generateReleaseNote(changelog, version);
+	}
+	const octokit = github.getOctokit(core.getInput("github_token"));
+	octokit.repos.createRelease({
+		owner: "dera-",
+		repo: core.getInput("git_repository"),
+		tag_name: "v" + version,
+		name: "Release " + version,
+		body: body,
+		target_commitish: core.getInput("target_branch")
 	});
-} catch (error) {
+}).catch(error => {
 	core.setFailed(error.message);
-}
+});
 
 
 /***/ }),
