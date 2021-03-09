@@ -9,6 +9,8 @@ const inputs = {
 	npmToken: core.getInput("npm_token"),
 };
 const targetDirPath = process.env.GITHUB_WORKSPACE;
+console.log(targetDirPath);
+console.log(fs.readdirSync(targetDirPath));
 const packageJsonPath = path.join(targetDirPath, "package.json");
 const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
 
