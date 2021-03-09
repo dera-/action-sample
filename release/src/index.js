@@ -28,9 +28,11 @@ const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
 			body = generateReleaseNote(changelog, version);
 		}
 		const octokit = github.getOctokit(inputs.githubToken);
+		// GITHUB_REPOSITORYのフォーマットは オーナー名/リポジトリ名 となっているのでそれぞれ抽出する
+		const repositoryInfo = process.env.GITHUB_REPOSITORY.split("/");
 		await octokit.repos.createRelease({
-			owner: "dera-",
-			repo: process.env.GITHUB_REPOSITORY,
+			owner: repositoryInfo[0],
+			repo: repositoryInfo[1],
 			tag_name: "v" + version,
 			name: "Release " + version,
 			body: body,
