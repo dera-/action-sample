@@ -13,9 +13,8 @@ core.debug(targetDirPath);
 core.debug(fs.readdirSync(targetDirPath));
 const packageJsonPath = path.join(targetDirPath, "package.json");
 const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
-
-(async () => {
-	try {
+try {
+	(async () => {
 		await npmPublish({
 			package: packageJsonPath,
 			token: inputs.npmToken,
@@ -29,15 +28,15 @@ const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
 			body = generateReleaseNote(changelog, version);
 		}
 		const octokit = github.getOctokit(inputs.githubToken);
-		return octokit.repos.createRelease({
+		octokit.repos.createRelease({
 			owner: "dera-",
 			repo: process.env.GITHUB_REPOSITORY,
 			tag_name: "v" + version,
 			name: "Release " + version,
 			body: body,
 			target_commitish: process.env.GITHUB_SHA
-		});
-	} catch(error) {
-		core.setFailed(error.message);
-	}
-})();
+			});
+	})();
+} catch(error) {
+	core.setFailed(error.message);
+}
