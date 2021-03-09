@@ -11519,7 +11519,7 @@ const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
 			target_commitish: process.env.GITHUB_SHA
 		});
 	} catch(error) {
-		core.setFailed(error.message);
+		core.setFailed(error.message + " " + process.env.GITHUB_REPOSITORY + " " + process.env.GITHUB_SHA);
 	}
 })();
 
