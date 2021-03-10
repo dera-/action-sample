@@ -9,16 +9,19 @@ const inputs = {
 	npmToken: core.getInput("npm_token"),
 };
 const targetDirPath = process.env.GITHUB_WORKSPACE;
-core.debug(targetDirPath);
-core.debug(fs.readdirSync(targetDirPath));
 const packageJsonPath = path.join(targetDirPath, "package.json");
 const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
+// GITHUB_REPOSITORYのフォーマットは オーナー名/リポジトリ名 となっているのでそれぞれ抽出する
+const repositoryInfo = process.env.GITHUB_REPOSITORY.split("/");
+const ownerName = repositoryInfo[0];
+const repositoryName = repositoryInfo[1];
+const gitCommitHash = process.env.GITHUB_SHA;
+
 (async () => {
 	try {
 		await npmPublish({
 			package: packageJsonPath,
-			token: inputs.npmToken,
-			access: "public"
+			token: inputs.npmToken
 		});
 		const packageJson = require(packageJsonPath);
 		const version = packageJson["version"];
@@ -28,17 +31,15 @@ const changelogPath = path.join(targetDirPath, "CHANGELOG.md");
 			body = generateReleaseNote(changelog, version);
 		}
 		const octokit = github.getOctokit(inputs.githubToken);
-		// GITHUB_REPOSITORYのフォーマットは オーナー名/リポジトリ名 となっているのでそれぞれ抽出する
-		const repositoryInfo = process.env.GITHUB_REPOSITORY.split("/");
 		await octokit.repos.createRelease({
-			owner: repositoryInfo[0],
-			repo: repositoryInfo[1],
+			owner: ownerName,
+			repo: repositoryName,
 			tag_name: "v" + version,
 			name: "Release " + version,
 			body: body,
-			target_commitish: process.env.GITHUB_SHA
+			target_commitish: gitCommitHash
 		});
 	} catch(error) {
-		core.setFailed(error.message + " " + process.env.GITHUB_REPOSITORY + " " + process.env.GITHUB_SHA);
+		core.setFailed(error.message);
 	}
 })();
