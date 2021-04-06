@@ -1,0 +1,36 @@
+name: Create tag
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  NODE_VERSION: 14
+  GIT_USER_NAME: dera-
+  GIT_USER_EMAIL: alchemy.and.fairy@gmail.com
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get version of package.json
+        id: version
+        run: |
+          VERSION=`cat package.json | jq -r '.version'`
+          echo "::set-output name=VERSION::$VERSION"
+      - name: Set git user infomartion
+        run: |
+          git config user.name $GIT_USER_NAME
+          git config user.email $GIT_USER_EMAIL
+      - name: Create tag
+        run: |
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+        env:
+          GITHUB_AUTH: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: v${{ steps.version.outputs.VERSION }}
