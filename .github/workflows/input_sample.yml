@@ -30,9 +30,9 @@ jobs:
       - name: run input sample
         run: |
           echo "input sample_string: ${{ inputs.sample_string }}"
-          node ./scrips/sample.js ${{ inputs.sample_string }}
-          node ./scrips/sample.js "${{ inputs.sample_string }}"
-          node ./scrips/sample.js ${SAMPLE_STRING}
-          node ./scrips/sample.js "${SAMPLE_STRING}""
+          node ./scripts/sample.js ${{ inputs.sample_string }}
+          node ./scripts/sample.js "${{ inputs.sample_string }}"
+          node ./scripts/sample.js ${SAMPLE_STRING}
+          node ./scripts/sample.js "${SAMPLE_STRING}""
         env:
           SAMPLE_STRING: ${{ inputs.sample_string }}
