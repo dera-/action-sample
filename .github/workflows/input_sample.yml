@@ -33,6 +33,9 @@ jobs:
           node ./scripts/sample.js ${{ inputs.sample_string }}
           node ./scripts/sample.js "${{ inputs.sample_string }}"
           node ./scripts/sample.js ${SAMPLE_STRING}
-          node ./scripts/sample.js "${SAMPLE_STRING}""
+          node ./scripts/sample.js "${SAMPLE_STRING}"
+          node ./scripts/sample.js ${SAMPLE_STRING2}
         env:
           SAMPLE_STRING: ${{ inputs.sample_string }}
+          SAMPLE_STRING2: "${{ inputs.sample_string }}"
+
