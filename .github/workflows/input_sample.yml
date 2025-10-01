@@ -1,0 +1,38 @@
+name: Input sample
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample_string:
+        description: "Sample string"
+        required: true
+        type: string
+        default: default value
+env:
+  NODE_VERSION: 14
+  GIT_USER_NAME: dera-
+  GIT_USER_EMAIL: alchemy.and.fairy@gmail.com
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+      
+      - name: run input sample
+        run: |
+          echo "input sample_string: ${{ inputs.sample_string }}"
+          node ./scrips/sample.js ${{ inputs.sample_string }}
+          node ./scrips/sample.js "${{ inputs.sample_string }}"
+          node ./scrips/sample.js ${SAMPLE_STRING}
+          node ./scrips/sample.js "${SAMPLE_STRING}""
+        env:
+          SAMPLE_STRING: ${{ inputs.sample_string }}
