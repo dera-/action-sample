@@ -22,6 +22,7 @@ const currentBranch = process.env.GITHUB_REF_NAME;
 (async () => {
 	try {
 		const octokit = github.getOctokit(inputs.githubToken);
+		console.log("onlyPullRequest", inputs.onlyPullRequest);
 		if (inputs.onlyPullRequest) {
 			const branchName = `update-changelog-for-${Date.now()}`;
 			await git.checkoutLocalBranch(branchName);
