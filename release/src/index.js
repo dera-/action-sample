@@ -59,11 +59,11 @@ const currentBranch = process.env.GITHUB_REF_NAME;
 			const changelog = fs.readFileSync(changelogPath).toString();
 			body = generateReleaseNote(changelog, version);
 		}
-		await octokit.repos.createRelease({
+		await octokit.rest.repos.createRelease({
 			owner: ownerName,
 			repo: repositoryName,
 			tag_name: "v" + version,
-			name: "Release " + version,
+			name: "Release v" + version,
 			body: body,
 			target_commitish: gitCommitHash
 		});
