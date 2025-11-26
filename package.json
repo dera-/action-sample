@@ -1,9 +1,12 @@
 {
   "name": "@dera-/action-sample",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "scripts": {
+    "prepare": "npm run build",
+    "build": "npm run build:release",
+    "build:release": "ncc build release/src/index.js -o ./release/dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,5 +17,8 @@
     "@actions/github": "^4.0.0",
     "@jsdevtools/npm-publish": "^1.4.3",
     "npm-run-all": "^4.1.5"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.4"
   }
 }
