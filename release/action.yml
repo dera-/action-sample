@@ -5,6 +5,10 @@ inputs:
     required: true
   npm_token:
     required: true
+  only_pull_request:
+    required: false
+    type: boolean
+    default: false
 runs:
   using: node20
   main: dist/index.js
