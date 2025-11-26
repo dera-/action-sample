@@ -4,6 +4,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const npmPublish = require("@jsdevtools/npm-publish");
 const generateReleaseNote = require("./generateReleaseNote");
+const simpleGit = require("simple-git");
 const inputs = {
 	githubToken: core.getInput("github_token"),
 	npmToken: core.getInput("npm_token"),
@@ -21,6 +22,10 @@ const currentBranch = process.env.GITHUB_REF_NAME;
 
 (async () => {
 	try {
+		const git = simpleGit(targetDirPath);
+		await git
+			.addConfig("user.name", "github-actions", undefined, "global")
+			.addConfig("user.email", "41898282+github-actions[bot]@users.noreply.github.com", undefined, "global");
 		const octokit = github.getOctokit(inputs.githubToken);
 		console.log("onlyPullRequest", inputs.onlyPullRequest);
 		if (inputs.onlyPullRequest) {
