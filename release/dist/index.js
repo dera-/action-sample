@@ -41802,8 +41802,8 @@ const currentBranch = process.env.GITHUB_REF_NAME;
 	try {
 		const git = simpleGit(targetDirPath);
 		await git
-			.addConfig("user.name", "github-actions", undefined, "global")
-			.addConfig("user.email", "41898282+github-actions[bot]@users.noreply.github.com", undefined, "global");
+			.addConfig("user.name", "dera-", undefined, "global")
+			.addConfig("user.email", "michihiro_onodera@dwango.co.jp", undefined, "global");
 		const octokit = github.getOctokit(inputs.githubToken);
 		console.log("onlyPullRequest", inputs.onlyPullRequest);
 		if (inputs.onlyPullRequest) {
