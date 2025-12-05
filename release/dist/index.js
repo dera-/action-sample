@@ -41806,24 +41806,69 @@ const currentBranch = process.env.GITHUB_REF_NAME;
 			.addConfig("user.email", "michihiro_onodera@dwango.co.jp", undefined, "global");
 		const octokit = github.getOctokit(inputs.githubToken);
 		console.log("onlyPullRequest", inputs.onlyPullRequest);
+		// if (inputs.onlyPullRequest) {
+		// 	const branchName = `update-changelog-for-${Date.now()}`;
+		// 	await git.checkoutLocalBranch(branchName);
+		// 	const newfilePath = path.join(targetDirPath, "test.txt");
+		// 	fs.writeFileSync(newfilePath, "date:" + Date.now());
+		// 	await git.add(newfilePath);
+		// 	await git.commit("add test.txt");
+		// 	await git.push("origin", branchName);
+		// 	const prTitle = `Add file`;
+		// 	const prBody = `Add file.\n\nPlease check the contents and merge this Pull Request to proceed with the release.`;
+		// 	await octokit.rest.pulls.create({
+		// 		owner: ownerName,
+		// 		repo: repositoryName,
+		// 		title: prTitle,
+		// 		body: prBody,
+		// 		head: branchName,
+		// 		base: currentBranch
+		// 	});
+		// 	return;
+		// }
 		if (inputs.onlyPullRequest) {
-			const branchName = `update-changelog-for-${Date.now()}`;
-			await git.checkoutLocalBranch(branchName);
+			const branchName = "github-actions/update-changelog";
+			let branchExists = true;
+			try {
+				await octokit.rest.repos.getBranch({
+					owner: ownerName,
+					repo: repositoryName,
+					branch: branchName,
+				});
+			} catch (error) {
+				if (error.status === 404) {
+					branchExists = false;
+				} else {
+					throw error;
+				}
+			}
+			if (!branchExists) {
+				await git.checkoutLocalBranch(branchName);
+			} else {
+				await git.checkout(branchName);
+			}
+
 			const newfilePath = path.join(targetDirPath, "test.txt");
 			fs.writeFileSync(newfilePath, "date:" + Date.now());
 			await git.add(newfilePath);
 			await git.commit("add test.txt");
-			await git.push("origin", branchName);
-			const prTitle = `Add file`;
-			const prBody = `Add file.\n\nPlease check the contents and merge this Pull Request to proceed with the release.`;
-			await octokit.rest.pulls.create({
+
+			await git.push("origin", branchName, { "--force": null });
+			const { data: pullRequests } = await octokit.rest.pulls.list({
 				owner: ownerName,
 				repo: repositoryName,
-				title: prTitle,
-				body: prBody,
-				head: branchName,
-				base: currentBranch
+				head: `${ownerName}:${branchName}`,
 			});
+			if (pullRequests.length === 0) {
+				await octokit.rest.pulls.create({
+					owner: ownerName,
+					repo: repositoryName,
+					title: prTitle,
+					body: prBody,
+					head: branchName,
+					base: currentBranch
+				});
+			}
 			return;
 		}
 		await npmPublish({
