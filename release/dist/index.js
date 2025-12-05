@@ -41827,45 +41827,30 @@ const currentBranch = process.env.GITHUB_REF_NAME;
 		// 	return;
 		// }
 		if (inputs.onlyPullRequest) {
-			const branchName = "github-actions/update-changelog";
-			let branchExists = true;
-			try {
-				await octokit.rest.repos.getBranch({
-					owner: ownerName,
-					repo: repositoryName,
-					branch: branchName,
-				});
-			} catch (error) {
-				if (error.status === 404) {
-					branchExists = false;
-				} else {
-					throw error;
-				}
-			}
-			if (!branchExists) {
-				await git.checkoutLocalBranch(branchName);
-			} else {
-				await git.checkout(branchName);
-			}
+			const localBranch = `update-changelog-${Date.now()}`;
+			const remoteBranch = "github-actions/update-changelog";
+			await git.checkoutLocalBranch(localBranch);
 
 			const newfilePath = path.join(targetDirPath, "test.txt");
 			fs.writeFileSync(newfilePath, "date:" + Date.now());
 			await git.add(newfilePath);
 			await git.commit("add test.txt");
 
-			await git.push("origin", branchName, { "--force": null });
+			await git.push("origin", `${localBranch}:${remoteBranch}`, { "--force": null });
 			const { data: pullRequests } = await octokit.rest.pulls.list({
 				owner: ownerName,
 				repo: repositoryName,
-				head: `${ownerName}:${branchName}`,
+				head: `${ownerName}:${remoteBranch}`,
 			});
 			if (pullRequests.length === 0) {
+				const prTitle = "Add test.txt";
+				const prBody = `Add test.txt.\n\nPlease check the contents and merge this Pull Request to proceed with the release.`;
 				await octokit.rest.pulls.create({
 					owner: ownerName,
 					repo: repositoryName,
 					title: prTitle,
 					body: prBody,
-					head: branchName,
+					head: remoteBranch,
 					base: currentBranch
 				});
 			}
